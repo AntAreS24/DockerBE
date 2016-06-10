@@ -8,7 +8,7 @@ The purpose of this project is to confirm if BE can work using Cache and Grid ac
 
 # tasks
 - Simple Setup
-  - [] Setup 1 VM (using vagrant and CoreOS to simplify the process)
-  - [] Test multicast between 2 simple CentOS Docker images (as it's supported by TIBCO BE)
-- [] Setup 2 VM (using vagrant and CoreOS to simplify the process)
-  - [] Test multicast between 1 simple CentOS Docker images on each VM.
+  - [ ] Setup 1 VM (using vagrant and CoreOS to simplify the process)
+  - [ ] Test multicast between 2 simple CentOS Docker images (as it's supported by TIBCO BE)
+- [ ] Setup 2 VM (using vagrant and CoreOS to simplify the process)
+  - [ ] Test multicast between 1 simple CentOS Docker images on each VM.
