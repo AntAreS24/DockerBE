@@ -7,37 +7,30 @@ require 'open-uri'
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.require_version ">= 1.6.0"
 
-CHANNEL = ENV['CHANNEL'] || 'alpha'
-COREOS_VERSION = ENV['COREOS_VERSION'] || 'latest'
-upstream = "http://#{CHANNEL}.release.core-os.net/amd64-usr/#{COREOS_VERSION}"
-if COREOS_VERSION == "latest"
-	upstream = "http://#{CHANNEL}.release.core-os.net/amd64-usr/current"
-	url = "#{upstream}/version.txt"
-	RETRIEVED_COREOS_VERSION = open(url).read().scan(/COREOS_VERSION=.*/)[0].gsub('COREOS_VERSION=', '')
-#else
-#	RETRIEVED_COREOS_VERSION = #{COREOS_VERSION}
-end
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-	config.vm.provider :virtualbox do |v|
-		# On VirtualBox, we don't have guest additions or a functional vboxsf
-		# in CoreOS, so tell Vagrant that so it can be smarter.
-		v.check_guest_additions = false
-		v.functional_vboxsf     = false
-	end
-	# Fix to solve DNS issue with private Docker registry
 	config.vm.provider :virtualbox do |v, override|
+		# bridged containers won't work, because the virtual NIC will filter out all packets with a different MAC address. If you are running VirtualBox in headless mode
+		v.customize ['modifyvm', :id, '--nic1', 'nat']
+		v.customize ['modifyvm', :id, '--nictype1', 'Am79C973'] #Am79C973|virtio
+		v.customize ['modifyvm', :id, '--nicpromisc1', 'allow-all']
+		# Fix to solve DNS issue with private Docker registry
 		v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
 		v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-		# bridged containers won't work, because the virtual NIC will filter out all packets with a different MAC address. If you are running VirtualBox in headless mode
-		v.customize ['modifyvm', :id, '--nictype1', 'Am79C973']
-		v.customize ['modifyvm', :id, '--nicpromisc1', 'allow-all']
 	end
-	config.vm.box = "coreos-#{CHANNEL}"
-	config.vm.box_version = ">= #{RETRIEVED_COREOS_VERSION}"
-	config.vm.box_url = "#{upstream}/coreos_production_vagrant.json"
+	config.vm.box = "bento/centos-6.7"
 
+	config.vm.provision "shell" do |shell|
+        shell.path = "provision.sh"
+    end
+	
 	config.vm.define "simple" do |c|
 		c.vm.hostname = "simple"
+		c.vm.network "private_network", ip: "10.20.30.100"
 	end
+
+	config.vm.define "simple2" do |c|
+		c.vm.hostname = "simple2"
+		c.vm.network "private_network", ip: "10.20.30.101"
+	end
+
 end
