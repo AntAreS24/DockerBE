@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'open-uri'
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+Vagrant.require_version ">= 1.6.0"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+	config.vm.provider :virtualbox do |v, override|
+		# bridged containers won't work, because the virtual NIC will filter out all packets with a different MAC address. If you are running VirtualBox in headless mode
+		v.customize ['modifyvm', :id, '--nic1', 'nat']
+		v.customize ['modifyvm', :id, '--nictype1', 'Am79C973'] #Am79C973|virtio
+		v.customize ['modifyvm', :id, '--nicpromisc1', 'allow-all']
+		# Fix to solve DNS issue with private Docker registry
+		v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+		v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+	end
+	config.vm.box = "coreos-stable"
+	config.vm.box_version = "1010.5.0"
+	config.vm.box_url = "https://storage.googleapis.com/stable.release.core-os.net/amd64-usr/1010.5.0/coreos_production_vagrant.json"
+
+	config.vm.define "simple" do |c|
+		c.vm.hostname = "simple"
+		c.vm.network "private_network", ip: "10.20.30.100"
+	end
+end

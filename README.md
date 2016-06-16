@@ -14,10 +14,12 @@ The purpose of this project is to confirm if BE can work using Cache and Grid ac
 - Advanced Setup
   - [X] Setup 2 VM (using vagrant and CoreOS to simplify the process)
   - [ ] Test multicast between 1 simple CentOS Docker images on each VM.
+  - [ ] Test multicast with BE
 
 
 # Details.
 ## Simple Setup
+### Testing multicast
 To test multicast between 2 containers on the same host, start up two containers with: [[https://github.com/docker/docker/issues/3043#issuecomment-51825140]]
 ```console
 docker run -it --name node1 centos:6.7 /bin/bash
@@ -38,8 +40,11 @@ iperf -c 224.0.55.55 -u -T 32 -t 3 -i 1
 ```
 You should be able to see the packets from node 2 show up in node 1's console, so looks like it's working.
 
+### Testing BE Cache Agent.
+TODO
 
 ## Advanced Setup
+### Testing multicast
 To test multicast between 2 containers on different host, start up two containers, one on each VM.
 ```console
 docker run --cap-add=NET_ADMIN -it centos:6.7 /bin/bash
@@ -72,3 +77,6 @@ yum -y install sudo
 yum -y install iproute
 sudo ip route add 224.0.0.0/4 dev eth0
 ````
+
+### Testing BE Cache Agent.
+TODO
