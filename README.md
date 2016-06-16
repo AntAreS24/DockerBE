@@ -6,68 +6,69 @@ The purpose of this project is to confirm if BE can work using Cache and Grid ac
 * multiple docker images on the same host
 * multiple docker images on different host.
 
-# tasks
+# Tasks
 - Simple Setup
   - [X] Setup 1 VM (using vagrant and CoreOS to simplify the process)
   - [X] Test multicast between 2 simple CentOS Docker images (as it's supported by TIBCO BE)
-    - To test multicast between 2 containers on the same host, start up two containers with: [[https://github.com/docker/docker/issues/3043#issuecomment-51825140]]
+  - [ ] Test multicast with BE
+- Advanced Setup
+  - [X] Setup 2 VM (using vagrant and CoreOS to simplify the process)
+  - [ ] Test multicast between 1 simple CentOS Docker images on each VM.
+
+
+# Details.
+## Simple Setup
+To test multicast between 2 containers on the same host, start up two containers with: [[https://github.com/docker/docker/issues/3043#issuecomment-51825140]]
 ```console
 docker run -it --name node1 centos:6.7 /bin/bash
 docker run -it --name node2 centos:6.7 /bin/bash
 ```
-
-    - Then in each one, I run:
+Then in each docker instance, run:
 ```console
-rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+yum -y install epel-release
 yum -y install iperf
 ````
-
-    - Then in node 1, I run:
+Then in node 1, run:
 ```console
 iperf -s -u -B 224.0.55.55 -i 1
 ```
-
-    - And in node 2, I run:
+And in node 2, run:
 ```console
 iperf -c 224.0.55.55 -u -T 32 -t 3 -i 1
 ```
+You should be able to see the packets from node 2 show up in node 1's console, so looks like it's working.
 
-    - I can see the packets from node 2 show up in node 1's console, so looks like it's working. The only thing I haven't figured out yet is multicasting among containers on different hosts. I'm sure that'll require forwarding the multicast traffic through some iptables magic.
-    - [ ] Test multicast with BE
-	
-- Advanced Setup
-  - [X] Setup 2 VM (using vagrant and CoreOS to simplify the process)
-  - [ ] Test multicast between 1 simple CentOS Docker images on each VM.
-    - To test multicast between 2 containers on different host, start up two containers with: [[https://github.com/docker/docker/issues/3043#issuecomment-51825140]]
+
+## Advanced Setup
+To test multicast between 2 containers on different host, start up two containers, one on each VM.
 ```console
-docker run -it centos:6.7 /bin/bash
+docker run --cap-add=NET_ADMIN -it centos:6.7 /bin/bash
 ```
+The `--cap-add=NET_ADMIN` is important if you need to create a new route.
 
-    - Then in each one, I run:
+Then in each docker instance, run:
 ```console
-sudo rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-sudo yum -y install iperf
-sudo yum -y install socat
+yum -y install epel-release
+yum -y install iperf
 ````
-
-    - Then in node 1, I run:
+Then in node 1, docker instance, run:
 ```console
 iperf -s -u -B 224.0.55.55 -i 1
 ```
-
-    - And in node 2, I run:
+And in node 2, docker instance, run:
 ```console
 iperf -c 224.0.55.55 -u -T 32 -t 3 -i 1
 ```
-
-    - OR on both nodes
+Another option is to use `socat`. So on both docker instances, run:
 ```console
+yum -y install socat
 socat STDIO UDP-DATAGRAM:224.0.0.1:2200,bind=:2200
 ```
+Then type what you want in one of the console. It should appear on the other one.
 
-    - Then type what you want in one of the console. It should appear on the other one.
-    - It might not work straight away. If that's the case, add the following line:
+It might not work straight away. If that's the case, you need to create a route for this specific IP on eth0:
 ```console
-sudo ip route add 224.0.0.0/4 dev eth1
+yum -y install sudo
+yum -y install iproute
+sudo ip route add 224.0.0.0/4 dev eth0
 ````
-    - I can see the packets from node 2 show up in node 1's console, so looks like it's working. The only thing I haven't figured out yet is multicasting among containers on different hosts. I'm sure that'll require forwarding the multicast traffic through some iptables magic.

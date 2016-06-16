@@ -19,9 +19,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
 	config.vm.box = "bento/centos-6.7"
 
-	config.vm.provision "shell" do |shell|
-        shell.path = "provision.sh"
-    end
+	config.vm.provision :shell, :path => "provision.sh"
+	#config.vm.provision :shell, :inline => "ip route delete default 2>&1 >/dev/null || true; ip route add default via #{default_router}"
 	
 	config.vm.define "simple" do |c|
 		c.vm.hostname = "simple"
