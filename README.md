@@ -41,7 +41,18 @@ iperf -c 224.0.55.55 -u -T 32 -t 3 -i 1
 You should be able to see the packets from node 2 show up in node 1's console, so looks like it's working.
 
 ### Testing BE Cache Agent.
-TODO
+*Requires BE 5.3*
+*Requires VPN connection to TIBCO network*
+*Requires Ant > 1.9.3 (otherwise, you need to build the EAR file manually)*
+
+1. Need to build the BE EAR file
+```console
+cd .\src\be\sampleWCache\sampleWCache
+ant
+```
+This will create the EAR file in `.\src\be\sampleWCache\build`
+
+
 
 ## Advanced Setup
 ### Testing multicast

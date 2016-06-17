@@ -1,0 +1,77 @@
+<?xml version="1.0"?> 
+<project name="Sample" default="build" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
+	<loadproperties srcFile="environment_specific.properties"/>
+	<loadproperties srcFile="common.properties"/>
+	<property name="tibco.ear.filename" value="${application.name}.ear"/>
+	<property name="tibco.ear.fullpath" location="${workspace.deploy}/${application.name}.ear"/>
+	<property name="current.path" location="."/>
+	<path id="tibco.project.libs">
+		<fileset dir="${workspace.lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+		
+
+	<target name="init" >
+		<echo message="Initialising ${ant.project.name}...." level="info"/>
+		<mkdir dir="${workspace.lib}"/>
+	</target>
+
+	<target name="clean">
+		<delete file="${tibco.ear.filename}" failonerror="false" />
+		<delete file="${workspace.deploy}/studio-tools-build-${ant.project.name}.log" failonerror="false" />
+	</target>
+	
+	<target name="build" depends="clean,init,createEARFile">
+		<echo>Project built completed.</echo>
+	</target>
+	
+	<!-- Set BuildEar executable name depending upon the Operation System the build is run on-->
+	<target name="setBuildEarExecutableName">
+		<condition property="tibco.buildear.executable" value="buildear.exe">
+			<os family="windows" />
+		</condition>
+		<condition property="tibco.buildear.executable" value="buildear">
+			<os family="unix" />
+		</condition>
+	</target>
+
+	<!-- Creating the EAR file -->
+	<target name="createEARFile" depends="setBuildEarExecutableName">
+		<echo message="Creating EAR file..." />
+
+		<!-- Get file length before -->
+		<length file="${tibco.ear.fullpath}" property="fs.length.before" />
+
+		<echo>Building archive: ${application.name}</echo>
+
+
+		<exec executable="${tibco.be.studio.bin}/studio-tools.exe" output="${workspace.deploy}/studio-tools-build-${ant.project.name}.log" append="true" failonerror="true">
+			<arg value="--propFile"/>
+			<arg value="${tibco.be.studio.bin}/studio-tools.tra"/>
+			<arg value="-cp"/>
+			<arg value="${toString:tibco.project.libs}"/>
+			<arg value="-core"/>
+			<arg value="buildear"/>
+			<arg value="-x"/>
+			<arg value="-o"/>
+			<arg value="${tibco.ear.fullpath}"/>
+			<arg value="-p"/>
+			<arg value="${basedir}"/>
+		</exec>
+
+		<!-- Verify that the EAR file exists -->
+		<available file="${tibco.ear.fullpath}" property="ear.present"/>
+		<fail unless="ear.present">Studio Tools  did not generate EAR. Please check log files.</fail>
+		
+		<!-- Get file length after -->
+		<length file="${tibco.ear.fullpath}" property="fs.length.after" />
+		<condition property="fs.equal">
+			<equals arg1="${fs.length.before}" arg2="${fs.length.after}"/>
+		</condition>	
+		<fail if="fs.equal">EAR file size has not changed and may not have been updated.</fail>
+
+		<echo>EAR created in ${tibco.ear.fullpath}</echo>
+	</target>
+
+</project>

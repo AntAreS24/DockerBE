@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event:SimpleEvent xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:event="http:///com/tibco/cep/designtime/core/model/event" namespace="/Events/" folder="/Events/" name="GetResponse" description="" GUID="CF247AF5-8173-AF04-D4AF-81FA282C0342" ownerProjectName="sampleWCache" superEventPath="" ttlUnits="Seconds" channelURI="/Channels/HTTP" destinationName="get">
+  <properties name="uid" ownerProjectName="sampleWCache" ownerPath="/Events/GetResponse"/>
+  <properties name="field" ownerProjectName="sampleWCache" ownerPath="/Events/GetResponse"/>
+  <expiryAction name="GetResponse_expiryAction" ownerProjectName="sampleWCache" actionText="" conditionText="">
+    <symbols>
+      <symbolList idName="getresponse" type="/Events/GetResponse"/>
+    </symbols>
+  </expiryAction>
+</event:SimpleEvent>

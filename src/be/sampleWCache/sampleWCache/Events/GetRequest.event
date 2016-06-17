@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event:SimpleEvent xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:event="http:///com/tibco/cep/designtime/core/model/event" namespace="/Events/" folder="/Events/" name="GetRequest" description="" GUID="B5B594B7-7F07-6131-8DE7-880E8A906969" ownerProjectName="sampleWCache" superEventPath="" ttlUnits="Seconds" channelURI="/Channels/HTTP" destinationName="get">
+  <properties name="conceptExtId" ownerProjectName="sampleWCache" ownerPath="/Events/GetRequest"/>
+  <expiryAction name="GetRequest_expiryAction" ownerProjectName="sampleWCache" actionText="" conditionText="">
+    <symbols>
+      <symbolList idName="getrequest" type="/Events/GetRequest"/>
+    </symbols>
+  </expiryAction>
+</event:SimpleEvent>

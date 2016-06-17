@@ -1,0 +1,28 @@
+/**
+ * @description 
+ */
+void rulefunction RuleFunctions.PreProc.CreateMyConcept {
+	attribute {
+		validity = ACTION;
+	}
+	scope {
+		Events.CreateRequest request;
+	}
+	body {
+		Object logger = Log.getLogger("RuleFunctions.PreProc.CreateMyConcept");
+		
+		Concepts.SimpleConcept simpleConcept = Concepts.SimpleConcept.SimpleConcept(
+			request.uid /*extId String */,
+			request.field /*MyField String */);
+			
+		Log.log(logger, "INFO", "MyConcept created with ID: [%s] and UID: [%s]", simpleConcept@id, simpleConcept@extId);
+		
+		Events.CreateResponse response = Events.CreateResponse.CreateResponse(
+			null /*extId String */,
+			null/*payload String */,
+			simpleConcept@id /*conceptId int */,
+			simpleConcept@extId /*conceptExtId String */);
+		Event.replyEvent(request, response);
+		Event.consumeEvent(request);
+	}
+}

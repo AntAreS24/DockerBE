@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration:StudioProjectConfiguration xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:configuration="http:///com/tibco/cep/studio/common/configuration/model/project_configuration.ecore" name="sampleWCache" version="5.3.0" build="164" xpathVersion="2.0">
+  <javaSourceFolderEntries entryType="JAVA_SOURCE_FOLDER" path="/sampleWCache/JavaSrc" readOnly="true"/>
+  <enterpriseArchiveConfiguration name="sampleWCache" author="Ben" version="1" path="C:\Users\Ben\sampleWCache.ear"/>
+  <bpmnProcessSettings/>
+</configuration:StudioProjectConfiguration>

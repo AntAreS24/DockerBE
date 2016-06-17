@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<element:Concept xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:element="http:///com/tibco/cep/designtime/core/model/element" namespace="/Concepts/" folder="/Concepts/" name="SimpleConcept" description="" GUID="3DE82749-199F-4C39-36A0-CAE34958A7CE" ownerProjectName="sampleWCache" superConceptPath="" autoStartStateMachine="true">
+  <extendedProperties/>
+  <properties name="MyField" ownerProjectName="sampleWCache" ownerPath="/Concepts/SimpleConcept"/>
+</element:Concept>

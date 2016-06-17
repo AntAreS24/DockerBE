@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event:SimpleEvent xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:event="http:///com/tibco/cep/designtime/core/model/event" namespace="/Events/" folder="/Events/" name="CreateRequest" description="" GUID="3FC5E54B-D0D5-CAFC-462A-B330599B8240" ownerProjectName="sampleWCache" superEventPath="" ttlUnits="Seconds" channelURI="/Channels/HTTP" destinationName="create">
+  <properties name="uid" ownerProjectName="sampleWCache" ownerPath="/Events/CreateRequest"/>
+  <properties name="field" ownerProjectName="sampleWCache" ownerPath="/Events/CreateRequest"/>
+  <expiryAction name="CreateRequest_expiryAction" ownerProjectName="sampleWCache" actionText="" conditionText="">
+    <symbols>
+      <symbolList idName="createrequest" type="/Events/CreateRequest"/>
+    </symbols>
+  </expiryAction>
+</event:SimpleEvent>

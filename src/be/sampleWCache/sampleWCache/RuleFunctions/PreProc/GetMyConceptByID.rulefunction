@@ -1,0 +1,39 @@
+/**
+ * @description 
+ */
+void rulefunction RuleFunctions.PreProc.GetMyConceptByID {
+	attribute {
+		validity = ACTION;
+	}
+	scope {
+		Events.GetRequest request;
+	}
+	body {
+		Object logger = Log.getLogger("RuleFunctions.PreProc.GetMyConceptByID");
+
+		Concepts.SimpleConcept simpleConcept = Cluster.DataGrid.CacheLoadConceptByExtId(
+			request.conceptExtId /* extId */,
+			false /* retrieve contained concepts*/);
+
+		Events.GetResponse response = null;
+		if(simpleConcept == null){
+			Log.log(logger, "ERROR", "SimpleConcept with extID [%s] not found in the cache...", request.conceptExtId);
+			response = Events.GetResponse.GetResponse(
+				null /*extId String */,
+				null /*payload String */,
+				null /*uid String */,
+				null /*field String */);
+		}else{
+			Log.log(logger, "INFO", "SimpleConcept with extID [%s] retrieved and stored in the cache.", request.conceptExtId);
+			response = Events.GetResponse.GetResponse(
+				null /*extId String */,
+				Instance.serializeToJSON(simpleConcept, true, "SimpleConcept") /*payload String */,
+				simpleConcept@extId /*uid String */,
+				simpleConcept.MyField /*field String */);
+		}
+		
+		Log.log(logger, "INFO", "Replying to request.", request.conceptExtId);
+		Event.replyEvent(request, response);
+		Event.consumeEvent(request);
+	}
+}
