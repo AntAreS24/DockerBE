@@ -41,9 +41,9 @@ iperf -c 224.0.55.55 -u -T 32 -t 3 -i 1
 You should be able to see the packets from node 2 show up in node 1's console, so looks like it's working.
 
 ### Testing BE Cache Agent.
-*Requires BE 5.3*
-*Requires VPN connection to TIBCO network*
-*Requires Ant > 1.9.3 (otherwise, you need to build the EAR file manually)*
+**Requires BE 5.3**
+**Requires VPN connection to TIBCO network**
+**Requires Ant > 1.9.3 (otherwise, you need to build the EAR file manually)**
 
 1. Need to build the BE EAR file
 ```console
@@ -52,6 +52,71 @@ ant
 ```
 This will create the EAR file in `.\src\be\sampleWCache\build`
 
+Then we can start the docker images
+```console
+docker run -d -p 8000:8000 -v /home/core/be:/data/be --env-file ./be/be-inf.env ddr.tibco.com:5000/businessevents:5.3.0
+docker run -d -v /home/core/be:/data/be --env-file ./be/be-cache1.env ddr.tibco.com:5000/businessevents:5.3.0
+docker run -d -v /home/core/be:/data/be --env-file ./be/be-cache1.env ddr.tibco.com:5000/businessevents:5.3.0
+```
+These commands will start the inference engine with 2 cache agent.
+
+Now, we need to find out the IP address of the inference engine:
+```console
+core@simple ~ $ docker ps
+CONTAINER ID        IMAGE                                     COMMAND                  CREATED             STATUS              PORTS                                        NAMES
+9b2aacca71ef        ddr.tibco.com:5000/businessevents:5.3.0   "/bin/sh -c /start.sh"   2 minutes ago       Up 2 minutes        8010/tcp, 8090/tcp                           stoic_thompson
+255f6ec8c485        ddr.tibco.com:5000/businessevents:5.3.0   "/bin/sh -c /start.sh"   5 minutes ago       Up 5 minutes        8010/tcp, 8090/tcp                           nostalgic_goldwasser
+c4b067ff16a8        ddr.tibco.com:5000/businessevents:5.3.0   "/bin/sh -c /start.sh"   About an hour ago   Up About an hour    8010/tcp, 0.0.0.0:8000->8000/tcp, 8090/tcp   loving_northcutt
+```
+
+Only one of them should have an additional port: 8000, which is the HTTP port openned. Let's get the IP address of this container:
+```console
+core@simple ~ $ docker inspect c4b067ff16a8 |grep \"IPAddress\"
+            "IPAddress": "172.17.0.2",
+                    "IPAddress": "172.17.0.2",
+```
+
+You can then simply test if it's working with the following commands:
+1. First we create the concept
+```console
+curl http://172.17.0.2:8000/Channels/HTTP/create?uid=1&field=Test
+```
+
+2. Then, we retrieve it
+```console
+curl http://172.17.0.2:8000/Channels/HTTP/get?conceptExtId=1
+{
+  "SimpleConcept" : {
+    "attributes" : {
+      "Id" : 14,
+      "extId" : "1",
+      "type" : "www.tibco.com/be/ontology/Concepts/SimpleConcept"
+    }
+  }
+}
+```
+
+3. To test the replication (set to 2 replicas BTW), simply kill a Cache Agent existing one, and start a new one:
+```console
+core@simple ~ $ docker ps
+CONTAINER ID        IMAGE                                     COMMAND                  CREATED             STATUS              PORTS                                        NAMES
+9b2aacca71ef        ddr.tibco.com:5000/businessevents:5.3.0   "/bin/sh -c /start.sh"   10 minutes ago      Up 10 minutes       8010/tcp, 8090/tcp                           stoic_thompson
+255f6ec8c485        ddr.tibco.com:5000/businessevents:5.3.0   "/bin/sh -c /start.sh"   13 minutes ago      Up 13 minutes       8010/tcp, 8090/tcp                           nostalgic_goldwasser
+c4b067ff16a8        ddr.tibco.com:5000/businessevents:5.3.0   "/bin/sh -c /start.sh"   About an hour ago   Up About an hour    8010/tcp, 0.0.0.0:8000->8000/tcp, 8090/tcp   loving_northcutt
+core@simple ~ $ docker kill 9b2aacca71ef
+9b2aacca71ef
+core@simple ~ $ docker run -d -v /home/core/be:/data/be --env-file ./be/be-cache1.env ddr.tibco.com:5000/businessevents:5.3.0
+core@simple ~ $ curl http://172.17.0.2:8000/Channels/HTTP/get?conceptExtId=1
+{
+  "SimpleConcept" : {
+    "attributes" : {
+      "Id" : 14,
+      "extId" : "1",
+      "type" : "www.tibco.com/be/ontology/Concepts/SimpleConcept"
+    }
+  }
+}
+```
 
 
 ## Advanced Setup

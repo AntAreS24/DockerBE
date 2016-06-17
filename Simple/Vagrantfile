@@ -9,6 +9,9 @@ Vagrant.require_version ">= 1.6.0"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.provider :virtualbox do |v, override|
+		v.cpus = 2
+		v.memory = 6164
+		
 		# bridged containers won't work, because the virtual NIC will filter out all packets with a different MAC address. If you are running VirtualBox in headless mode
 		v.customize ['modifyvm', :id, '--nic1', 'nat']
 		v.customize ['modifyvm', :id, '--nictype1', 'Am79C973'] #Am79C973|virtio
@@ -24,5 +27,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.define "simple" do |c|
 		c.vm.hostname = "simple"
 		c.vm.network "private_network", ip: "10.20.30.100"
+		c.vm.synced_folder "../be/", "/home/core/be/", :id => "core", :nfs => true, :mount_options => ['nolock,vers=3,udp,noatime']
+		config.vm.provision :file, :source => "../src/be/sampleWCache/build/sampleWCache.ear", :destination => "/home/core/be/sampleWCache.ear"
+		config.vm.provision :file, :source => "../src/be/sampleWCache/sampleWCache/Deployments/SampleWCache.cdd", :destination => "/home/core/be/SampleWCache.cdd"
 	end
 end
